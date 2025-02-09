@@ -106,5 +106,24 @@ def labels(
         typer.echo(f"Error retrieving labels: {str(e)}")
         raise typer.Exit(1)
 
+@app.command()
+def add_card(
+    list_id: Annotated[str, typer.Option("--list-id", "-l", help="ID of the Trello list")],
+    name: Annotated[str, typer.Option("--name", "-n", help="Name of the card")],
+    labels: Annotated[List[str], typer.Option("--label", "-lb", help="Label IDs to add to the card")] = None,
+    comment: Annotated[str, typer.Option("--comment", "-c", help="Comment to add to the card")] = None,
+    api_key: Annotated[str, typer.Option("--api-key", envvar="TRELLO_API_KEY")] = None,
+    token: Annotated[str, typer.Option("--token", envvar="TRELLO_TOKEN")] = None
+):
+    """Add a new card to a Trello list with optional labels and comment."""
+    trello = get_trello_client(api_key, token)
+
+    try:
+        card = trello.create_card(list_id, name, labels, comment)
+        typer.echo(f"Successfully created card: {card['shortUrl']}")
+    except Exception as e:
+        typer.echo(f"Error creating card: {str(e)}")
+        raise typer.Exit(1)
+
 if __name__ == "__main__":
     app()
