@@ -53,11 +53,33 @@ def boards(
             table.add_row(board['name'], board['id'])
         
         console.print(table)
-
     except Exception as e:
         typer.echo(f"Error retrieving boards: {str(e)}")
         raise typer.Exit(1)
 
+@app.command()
+def lists(
+    board_id: Annotated[str, typer.Option("--board-id", "-b", help="ID of the Trello board")],
+    api_key: Annotated[str, typer.Option("--api-key", envvar="TRELLO_API_KEY")] = None,
+    token: Annotated[str, typer.Option("--token", envvar="TRELLO_TOKEN")] = None
+):
+    """List all lists in a specific Trello board."""
+    trello = get_trello_client(api_key, token)
+    
+    try:
+        board_lists = trello.get_lists_in_board(board_id)
+        
+        table = Table(title=f"Lists in Board {board_id}")
+        table.add_column("Name", style="cyan")
+        table.add_column("List ID", style="magenta")
+        
+        for lst in board_lists:
+            table.add_row(lst['name'], lst['id'])
+        
+        console.print(table)
+    except Exception as e:
+        typer.echo(f"Error retrieving lists: {str(e)}")
+        raise typer.Exit(1)
 
 if __name__ == "__main__":
     app()
