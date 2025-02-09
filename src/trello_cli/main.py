@@ -81,5 +81,30 @@ def lists(
         typer.echo(f"Error retrieving lists: {str(e)}")
         raise typer.Exit(1)
 
+@app.command()
+def labels(
+    board_id: Annotated[str, typer.Option("--board-id", "-b", help="ID of the Trello board")],
+    api_key: Annotated[str, typer.Option("--api-key", envvar="TRELLO_API_KEY")] = None,
+    token: Annotated[str, typer.Option("--token", envvar="TRELLO_TOKEN")] = None
+):
+    """List all labels in a specific Trello board."""
+    trello = get_trello_client(api_key, token)
+    
+    try:
+        label_list = trello.get_labels_in_board(board_id)
+        
+        table = Table(title=f"Labels in Board {board_id}")
+        table.add_column("Name", style="cyan")
+        table.add_column("Label ID", style="magenta")
+        table.add_column("Color", style="green")
+        
+        for label in label_list:
+            table.add_row(label['name'], label['id'], label['color'])
+        
+        console.print(table)
+    except Exception as e:
+        typer.echo(f"Error retrieving labels: {str(e)}")
+        raise typer.Exit(1)
+
 if __name__ == "__main__":
     app()
