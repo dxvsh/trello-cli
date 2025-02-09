@@ -4,42 +4,23 @@ build-backend = "hatchling.build"
 
 [project]
 name = "trello-cli"
-dynamic = ["version"]
+version = "0.1.0"
 description = ''
 readme = "README.md"
 requires-python = ">=3.8"
 license = "MIT"
 keywords = []
 authors = [
-  { name = "dxvsh", email = "vashishtdakksh@gmail.com" },
+  { name = "dxvsh", email = "100519702+dxvsh@users.noreply.github.com" },
 ]
-classifiers = [
-  "Development Status :: 4 - Beta",
-  "Programming Language :: Python",
-  "Programming Language :: Python :: 3.8",
-  "Programming Language :: Python :: 3.9",
-  "Programming Language :: Python :: 3.10",
-  "Programming Language :: Python :: 3.11",
-  "Programming Language :: Python :: 3.12",
-  "Programming Language :: Python :: Implementation :: CPython",
-  "Programming Language :: Python :: Implementation :: PyPy",
+dependencies = [
+    "typer>=0.15.0",
+    "requests>=2.31.0",
+    "rich>=10.0.0",
 ]
-dependencies = []
 
-[project.urls]
-Documentation = "https://github.com/dxvsh/trello-cli#readme"
-Issues = "https://github.com/dxvsh/trello-cli/issues"
-Source = "https://github.com/dxvsh/trello-cli"
-
-[tool.hatch.version]
-path = "src/trello_cli/__about__.py"
-
-[tool.hatch.envs.types]
-extra-dependencies = [
-  "mypy>=1.0.0",
-]
-[tool.hatch.envs.types.scripts]
-check = "mypy --install-types --non-interactive {args:src/trello_cli tests}"
+[project.scripts]
+trello-cli = "trello_cli.main:app"
 
 [tool.coverage.run]
 source_pkgs = ["trello_cli", "tests"]
