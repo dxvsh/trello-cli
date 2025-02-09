@@ -17,6 +17,7 @@ class TrelloAPI:
         url = f"{self.BASE_URL}/members/me/boards"
         params = {
             **self.auth_params,
+            # we just want the name and id of the user's boards
             'fields': 'name,id'
         }
         
@@ -35,6 +36,7 @@ class TrelloAPI:
         url = f"{self.BASE_URL}/boards/{board_id}/lists"
         params = {
             **self.auth_params,
+            # only returns the name and id of the lists in the specified board
             'fields': 'name,id'
         }
         
@@ -53,7 +55,8 @@ class TrelloAPI:
         url = f"{self.BASE_URL}/boards/{board_id}/labels"
         params = {
             **self.auth_params,
-            'fields': 'name,id,color'
+            # we want the name, id and color for each label in this board
+            'fields': 'name,id,color'  
         }
         
         response = requests.get(url, params=params)
@@ -61,9 +64,10 @@ class TrelloAPI:
         
         return [
             {
-                'name': label.get('name', 'Unnamed Label'), 
+                # label names can also be empty strings (''), and color can be NoneType
+                'name': label['name'] if label['name'] else 'Unnamed Label',
                 'id': label['id'],
-                'color': label.get('color', 'No Color')
+                'color': label['color'] if label['color'] else 'No Color'
             } for label in response.json()
         ]
     
@@ -77,6 +81,9 @@ class TrelloAPI:
             'name': name,
         }
         
+        # if a list of lable ids is given, make sure to convert it
+        # into a string of comma separated values, so we can use 
+        # them in the API call for adding labels to our card
         if labels:
             params['idLabels'] = ','.join(labels)
             
