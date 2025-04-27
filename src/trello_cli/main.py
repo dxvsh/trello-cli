@@ -107,6 +107,35 @@ def labels(
         raise typer.Exit(1)
 
 @app.command()
+def search(
+    query: Annotated[str, typer.Option("--query", "-q", help="Query string to search for")],
+    api_key: Annotated[str, typer.Option("--api-key", envvar="TRELLO_API_KEY")] = None,
+    token: Annotated[str, typer.Option("--token", envvar="TRELLO_TOKEN")] = None
+):
+    """Search for a card using a query string across all your boards"""
+    trello = get_trello_client(api_key, token)
+
+    try:
+        search_results = trello.search_cards(query)
+
+        if not search_results:
+            typer.echo(f"No cards found for the query string: {query}")
+            raise typer.Exit()
+
+        table = Table(title=f"Card results for the query string: {query}")
+        table.add_column("Card ID", style="cyan")   
+        table.add_column("Name", style="magenta")   
+        table.add_column("URL", style="green")
+
+        for result in search_results:
+            table.add_row(result['id'], result['name'], result['shortUrl'])
+        
+        console.print(table)
+    except Exception as e:
+        typer.echo(f"Error retrieving search results: {str(e)}")
+        raise typer.Exit(1)   
+
+@app.command()
 def add_card(
     list_id: Annotated[str, typer.Option("--list-id", "-l", help="ID of the Trello list")],
     name: Annotated[str, typer.Option("--name", "-n", help="Name of the card")],

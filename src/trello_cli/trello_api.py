@@ -71,6 +71,28 @@ class TrelloAPI:
             } for label in response.json()
         ]
     
+    def search_cards(self, query: str) -> List[Dict[str, str]]:
+        """Search for cards using a query string across all your boards"""
+        url = f"{self.BASE_URL}/search"
+
+        params = {
+            **self.auth_params,
+            'query': query,
+            'modelTypes': 'cards', # only search for cards,
+            'card_fields': 'name,shortUrl'
+        }
+
+        response = requests.get(url, params=params)
+        response.raise_for_status()
+
+        return [
+            {
+                'id': card['id'],
+                'name': card['name'],
+                'shortUrl': card['shortUrl']
+            } for card in response.json()['cards']
+        ]
+
     def create_card(self, list_id: str, name: str, labels: list[str] = None, comment: str = None) -> dict:
         """Create a new card in the specified list."""
         url = f"{self.BASE_URL}/cards"
