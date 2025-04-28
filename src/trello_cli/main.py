@@ -107,6 +107,35 @@ def labels(
         raise typer.Exit(1)
 
 @app.command()
+def view_cards(
+    list_id: Annotated[str, typer.Option("--list-id", "-l", help="ID of the Trello list")],
+    api_key: Annotated[str, typer.Option("--api-key", envvar="TRELLO_API_KEY")] = None,
+    token: Annotated[str, typer.Option("--token", envvar="TRELLO_TOKEN")] = None
+):
+    """View all the cards in a specific list."""
+    trello = get_trello_client(api_key, token)
+
+    try:
+        cards = trello.get_cards_in_list(list_id)
+
+        if not cards:
+            typer.echo("The list does not contain any cards yet")
+            return
+
+        table = Table(title=f"Cards in list: {trello.get_list_name(list_id)}[{list_id}]")
+        table.add_column("Card ID", style="cyan")   
+        table.add_column("Name", style="magenta")   
+        table.add_column("URL", style="green")
+
+        for card in cards:
+            table.add_row(card['id'], card['name'], card['shortUrl'])
+        console.print(table)
+
+    except Exception as e:
+        typer.echo(f"Error displaying the cards in list: {str(e)}")
+        raise typer.Exit(1)
+
+@app.command()
 def search(
     query: Annotated[str, typer.Option("--query", "-q", help="Query string to search for")],
     api_key: Annotated[str, typer.Option("--api-key", envvar="TRELLO_API_KEY")] = None,
@@ -120,7 +149,7 @@ def search(
 
         if not search_results:
             typer.echo(f"No cards found for the query string: {query}")
-            raise typer.Exit()
+            return
 
         table = Table(title=f"Card results for the query string: {query}")
         table.add_column("Card ID", style="cyan")   

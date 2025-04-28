@@ -49,6 +49,38 @@ class TrelloAPI:
                 'id': lst['id']
             } for lst in response.json()
         ]
+    
+    def get_list_name(self, list_id: str) -> Dict[str, str]:
+        """Get the name of a list using its id"""
+        url = f"{self.BASE_URL}/lists/{list_id}"
+        params = {
+            **self.auth_params,
+            'fields': 'name'
+        }
+
+        response = requests.get(url, params=params)
+        response.raise_for_status()
+
+        return response.json()['name']
+
+    def get_cards_in_list(self, list_id: str) -> List[Dict[str, str]]:
+        """Retrieve all the cards in a specific list"""
+        url = f"{self.BASE_URL}/lists/{list_id}/cards"
+        params = {
+            **self.auth_params,
+            'fields': 'id,name,shortUrl'
+        }
+
+        response = requests.get(url, params=params)
+        response.raise_for_status()
+
+        return [
+            {
+                'id': card['id'],
+                'name': card['name'],
+                'shortUrl': card['shortUrl']
+            } for card in response.json()
+        ]
 
     def get_labels_in_board(self, board_id: str) -> List[Dict[str, str]]:
         """Retrieve all labels in a specific board."""
