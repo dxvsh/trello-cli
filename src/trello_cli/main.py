@@ -182,6 +182,38 @@ def add_card(
     except Exception as e:
         typer.echo(f"Error creating card: {str(e)}")
         raise typer.Exit(1)
+    
+@app.command()
+def update_card(
+    card_id: Annotated[str, typer.Option("--card-id", "-cid", help="ID of the Trello card")],
+    name: Annotated[str, typer.Option("--name", "-n", help="Name of the card")] = None,
+    list_id: Annotated[str, typer.Option("--list-id", "-l", help="ID of the Trello list")] = None,
+    comment: Annotated[str, typer.Option("--comment", "-c", help="Comment to add to the card")] = None,
+    archive: Annotated[Optional[bool], typer.Option("--archive/--unarchive")] = None,
+    api_key: Annotated[str, typer.Option("--api-key", envvar="TRELLO_API_KEY")] = None,
+    token: Annotated[str, typer.Option("--token", envvar="TRELLO_TOKEN")] = None
+):
+    """Update an existing Trello card."""
+    trello = get_trello_client(api_key, token)
+
+    try:
+        updated_card = trello.update_card(card_id, name, list_id, comment, archive)
+
+        # Neatly display the details of the updated card in a table
+        table = Table(title="Updated card details:")
+        table.add_column("Details", style="cyan")   
+        table.add_column("Values", style="magenta")   
+
+        table.add_row("Card Name", updated_card["name"])
+        table.add_row("List ID", updated_card["idList"])
+        table.add_row("Archived", str(updated_card["closed"]))
+        table.add_row("Comments", str(updated_card["badges"]["comments"])) 
+        table.add_row("URL", updated_card["shortUrl"])  
+        
+        console.print(table)
+    except Exception as e:
+        typer.echo(f"Error updating the card: {str(e)}")
+        raise typer.Exit(1)
 
 if __name__ == "__main__":
     app()

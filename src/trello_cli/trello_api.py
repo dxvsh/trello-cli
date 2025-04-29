@@ -152,6 +152,38 @@ class TrelloAPI:
             
         return card
     
+    def update_card(self, card_id: str, name: str = None, list_id: str = None, 
+                    comment: str = None, archive: bool = None) -> dict:
+        """Update an existing card using its ID. 
+        Allow changing its name, list, archival state and add the possibility of adding comments"""
+        url = f"{self.BASE_URL}/cards/{card_id}"
+
+        params = {
+            **self.auth_params
+        }
+                
+        # Only add parameters that are not None
+        if name is not None:
+            params['name'] = name
+        if list_id is not None:
+            params['idList'] = list_id
+        
+        # Only modify the archival state if its explicitly passed
+        # This ensures that we dont mistakenly unarchive an archived card if no value was explicitly passed
+        if archive is not None:
+            if archive:
+                params['closed'] = 'true'
+            else:
+                params['closed'] = 'false'
+
+        if comment:
+            self.add_comment(card_id, comment)
+
+        response = requests.put(url, params=params)
+        response.raise_for_status()
+
+        return response.json()
+
     def add_comment(self, card_id: str, comment: str) -> dict:
         """Add a comment to a card."""
         url = f"{self.BASE_URL}/cards/{card_id}/actions/comments"
