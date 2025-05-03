@@ -1,6 +1,6 @@
 # Trello CLI
 
-`trello-cli` is a simple CLI tool for managing your Trello cards. It allows you to create cards, add labels, and include comments directly from your terminal without needing to access the Trello web interface.
+`trello-cli` is a simple CLI tool for managing your Trello cards. It allows you to search, create and update your cards directly from your terminal without needing to access the Trello web interface.
 
 -----
 
@@ -17,8 +17,9 @@
 
 - Card Search: Search for cards across all your boards
 - Create Cards: Add new cards to any list with labels and comments
+- Update Cards: Update existing cards, including their names, lists, comments and archival state
 - Board Discovery: View all your Trello boards with their IDs
-- List Discovery: View all lists within a board
+- List Discovery: View all lists within a board and cards within those lists
 - Label Discovery: View all available labels in a board
 - Environment Variable Support: Configure your Trello credentials via environment variables or command-line options
 - Rich Terminal Output: Beautifully formatted output for better readability using `rich`
@@ -94,6 +95,13 @@ trello-cli lists -b <board_id> # short form
 trello-cli lists --help # for more information
 ```
 
+- View Cards in a List
+
+```bash
+trello-cli view-cards --list-id <list_id>
+trello-cli view-cards -l <list_id> # short form
+```
+
 - View Labels in a Board
 
 ```bash
@@ -122,6 +130,15 @@ trello-cli add-card --help  # for more information
 trello-cli add-card --list-id <list_id> --name "Card Name" --label <label_id_1>,<label_id_2> --comment "Card Comment"
 ```
 
+- Update an existing Card (e.g., change name, list, add comments, archive/unarchive)
+
+```bash
+trello-cli update-card --card-id <card_id> --name "Updated Card Name" --list-id <new_list_id> --comment "New Comment" 
+trello-cli update-card --card-id <card_id> --archive # to archive the card
+trello-cli update-card --card-id <card_id> --unarchive # to unarchive the card
+trello-cli update-card --help # for more information
+```
+
 ## Workflow Example
 
 1. Find your board ID:
@@ -146,6 +163,12 @@ trello-cli labels --board-id <board_id>
 
 ```bash
 trello-cli add-card --list-id <list_id> --name "New Feature" --label <label_id> --comment "Priority task for sprint"
+```
+
+5. Update or archive your cards if you want:
+
+```bash
+trello-cli update-card --card-id <card_id> --name "Updated Feature" --list-id <new_list_id> --archive
 ```
 
 ## Help & References
